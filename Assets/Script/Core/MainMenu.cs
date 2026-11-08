@@ -5,15 +5,14 @@ using UnityEngine.EventSystems;
 
 public class MainMenu : MonoBehaviour
 {
-    [SerializeField] GameObject menuPanel, settingPanel, aboutPanel;
+    [SerializeField] GameObject menuPanel, logo, settingPanel, aboutPanel;
     [SerializeField] Button firstButton, loadButton;
     [SerializeField] string firstScene = "Stage1";
 
     void Start()
     {
-        Show(menuPanel);
+        ShowMenu();
         loadButton.interactable = PlayerPrefs.HasKey("stage");
-        EventSystem.current.SetSelectedGameObject(firstButton.gameObject);
     }
 
     public void NewGame()
@@ -22,15 +21,31 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(firstScene);
     }
 
-    public void LoadGame() => SceneManager.LoadScene(PlayerPrefs.GetString("stage"));
-    public void OpenSetting() => Show(settingPanel);
-    public void OpenAbout() => Show(aboutPanel);
-    public void Back() => Show(menuPanel);
-
-    void Show(GameObject p)
+    public void LoadGame()
     {
-        menuPanel.SetActive(p == menuPanel);
-        settingPanel.SetActive(p == settingPanel);
-        aboutPanel.SetActive(p == aboutPanel);
+        if (PlayerPrefs.HasKey("stage"))
+            SceneManager.LoadScene(PlayerPrefs.GetString("stage"));
+    }
+
+    public void OpenSetting() => ShowPopup(settingPanel);
+    public void OpenAbout()   => ShowPopup(aboutPanel);
+    public void CloseAll()    => ShowMenu();
+
+    void ShowPopup(GameObject popup)
+    {
+        menuPanel.SetActive(false);
+        logo.SetActive(false);
+        settingPanel.SetActive(popup == settingPanel);
+        aboutPanel.SetActive(popup == aboutPanel);
+    }
+
+    void ShowMenu()
+    {
+        settingPanel.SetActive(false);
+        aboutPanel.SetActive(false);
+        menuPanel.SetActive(true);
+        logo.SetActive(true);
+        EventSystem.current.SetSelectedGameObject(null);
+        EventSystem.current.SetSelectedGameObject(firstButton.gameObject);
     }
 }
